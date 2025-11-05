@@ -1,198 +1,264 @@
-# TikTask2.0
+# TikTask
 
-TikTask2.0 is a modern task management web application built with .NET 9, featuring a Blazor Server frontend and ASP.NET Core Web API backend with SQLite database.
+TikTask es una aplicación web moderna de gestión de tareas construida con Node.js, Express y SQLite.
 
-## Features
+## Características
 
-- **User Authentication**: Register and login with secure password hashing (BCrypt)
-- **Task Management**: Create, edit, delete, and mark tasks as complete
-- **Due Dates**: Set due dates for tasks to stay organized
-- **Admin Role**: Admin users can view all users' tasks
-- **Responsive Design**: Clean and modern UI built with Blazor
-- **JWT Authentication**: Secure API endpoints with JWT tokens
-- **SQLite Database**: Lightweight and portable database
+- **Autenticación de Usuarios**: Registro e inicio de sesión con hash seguro de contraseñas (BCrypt)
+- **Gestión de Tareas**: Crear, editar, eliminar y marcar tareas como completadas
+- **Fechas de Vencimiento**: Establecer fechas límite para las tareas
+- **Rol de Administrador**: Los usuarios administradores pueden ver las tareas de todos los usuarios con sus nombres de usuario
+- **Diseño Responsivo**: UI limpia y moderna con HTML/CSS/JavaScript puro
+- **Autenticación JWT**: Endpoints de API seguros con tokens JWT
+- **Base de Datos SQLite**: Base de datos ligera y portátil
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
-TikTask2.0/
+TikTask/
+├── public/                 # Frontend (HTML/CSS/JavaScript)
+│   ├── index.html         # Aplicación de una sola página
+│   ├── styles.css         # Estilos
+│   └── app.js             # Lógica del cliente
 ├── src/
-│   ├── TikTask2.0.API/          # Backend Web API
-│   │   ├── Controllers/         # API Controllers
-│   │   ├── Data/               # Database Context
-│   │   ├── DTOs/               # Data Transfer Objects
-│   │   ├── Models/             # Database Models
-│   │   └── Services/           # Business Services
-│   └── TikTask2.0.Web/          # Frontend Blazor App
-│       ├── Components/          # Blazor Components
-│       ├── Models/             # Client Models
-│       └── Services/           # API Client Services
-├── azure-pipelines.yml          # Azure DevOps Pipeline
-└── TikTask2.0.sln              # Solution File
+│   ├── config/            # Configuración
+│   │   └── database.js    # Configuración de SQLite
+│   ├── middleware/        # Middleware de Express
+│   │   └── auth.js        # Middleware de autenticación
+│   ├── models/            # Modelos de datos
+│   │   ├── User.js        # Modelo de usuario
+│   │   └── Task.js        # Modelo de tarea
+│   ├── routes/            # Rutas de API
+│   │   ├── auth.js        # Rutas de autenticación
+│   │   └── tasks.js       # Rutas de tareas
+│   └── seed.js            # Seeding de base de datos
+├── server.js              # Punto de entrada del servidor
+├── package.json           # Dependencias de Node.js
+├── web.config             # Configuración para Azure App Services
+└── azure-pipelines.yml    # Pipeline de Azure DevOps
 ```
 
-## Technologies Used
+## Tecnologías Utilizadas
 
-- **.NET 9.0**: Latest .NET framework
-- **ASP.NET Core Web API**: RESTful API backend
-- **Blazor Server**: Interactive web UI
-- **Entity Framework Core**: ORM for database access
-- **SQLite**: Lightweight database
-- **JWT (JSON Web Tokens)**: Authentication
-- **BCrypt**: Password hashing
+- **Node.js**: Runtime de JavaScript
+- **Express**: Framework web
+- **SQLite**: Base de datos
+- **JWT (JSON Web Tokens)**: Autenticación
+- **BCrypt**: Hash de contraseñas
+- **HTML/CSS/JavaScript**: Frontend sin frameworks
 
-## Prerequisites
+## Requisitos Previos
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- A code editor (Visual Studio, VS Code, or Rider)
+- [Node.js 18+](https://nodejs.org/)
+- npm (viene con Node.js)
 
-## Getting Started
+## Inicio Rápido
 
-### 1. Clone the Repository
+### 1. Clonar el Repositorio
 
 ```bash
 git clone https://github.com/baujuncos/TP5_IS3.git
 cd TP5_IS3
 ```
 
-### 2. Run the API
+### 2. Instalar Dependencias
 
 ```bash
-cd src/TikTask2.0.API
-dotnet run
+npm install
 ```
 
-The API will start on `https://localhost:7001`
+### 3. Configurar Variables de Entorno
 
-### 3. Run the Web Application
-
-In a new terminal:
+Copia el archivo `.env.example` a `.env`:
 
 ```bash
-cd src/TikTask2.0.Web
-dotnet run
+cp .env.example .env
 ```
 
-The web app will start on `https://localhost:7002`
+Edita `.env` si necesitas cambiar la configuración:
+```
+PORT=3000
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+NODE_ENV=development
+DATABASE_PATH=./database.sqlite
+```
 
-### 4. Access the Application
+### 4. Iniciar el Servidor
 
-Open your browser and navigate to `https://localhost:7002`
+```bash
+npm start
+```
 
-## Default Users
+El servidor se ejecutará en `http://localhost:3000`
 
-On first run, you can register a new user. To create an admin user, you'll need to manually update the database or modify the registration code.
+### 5. Acceder a la Aplicación
 
-### Creating an Admin User
+Abre tu navegador y navega a `http://localhost:3000`
 
-After registering a regular user, you can modify the database directly:
+## Credenciales por Defecto
 
-1. Stop the API
-2. Open the `tiktask.db` file with a SQLite tool
-3. Update the user's Role to "Admin":
-   ```sql
-   UPDATE Users SET Role = 'Admin' WHERE Username = 'yourusername';
-   ```
-4. Restart the API
+### Usuario Administrador
+- **Usuario**: `admin`
+- **Contraseña**: `Admin123!`
+
+### Crear Usuario Normal
+1. Haz clic en "Regístrate aquí" en la página de inicio de sesión
+2. Completa el formulario con tus datos
+3. Haz clic en "Registrarse"
+
+## Uso de la Aplicación
+
+### 1. Registro/Inicio de Sesión
+- Al abrir la aplicación, serás redirigido a la página de inicio de sesión
+- Puedes registrarte o iniciar sesión con el usuario admin
+
+### 2. Crear una Tarea
+1. Haz clic en el botón "+ Nueva Tarea"
+2. Completa el formulario:
+   - **Título**: Título de la tarea (requerido)
+   - **Descripción**: Descripción detallada (opcional)
+   - **Fecha de Vencimiento**: Fecha límite (opcional)
+3. Haz clic en "Guardar"
+
+### 3. Gestionar Tareas
+- **Completar**: Haz clic en "Completar" para marcar una tarea como completada
+- **Editar**: Haz clic en "Editar" para modificar una tarea
+- **Eliminar**: Haz clic en "Eliminar" para eliminar una tarea
+
+### 4. Funcionalidad de Administrador
+1. Inicia sesión como administrador
+2. Verás un botón "Ver Todas las Tareas"
+3. Haz clic para ver las tareas de todos los usuarios con sus nombres de usuario
+4. Haz clic en "Ver Mis Tareas" para volver a tus tareas
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and get JWT token
+### Autenticación
+- `POST /api/auth/register` - Registrar un nuevo usuario
+- `POST /api/auth/login` - Iniciar sesión y obtener token JWT
 
-### Tasks
-- `GET /api/tasks` - Get current user's tasks
-- `GET /api/tasks/all` - Get all tasks (Admin only)
-- `GET /api/tasks/{id}` - Get specific task
-- `POST /api/tasks` - Create new task
-- `PUT /api/tasks/{id}` - Update task
-- `PATCH /api/tasks/{id}/complete` - Toggle task completion
-- `DELETE /api/tasks/{id}` - Delete task
+### Tareas
+- `GET /api/tasks` - Obtener las tareas del usuario actual
+- `GET /api/tasks/all` - Obtener todas las tareas (Solo Admin)
+- `POST /api/tasks` - Crear nueva tarea
+- `PUT /api/tasks/:id` - Actualizar tarea
+- `PATCH /api/tasks/:id/complete` - Alternar completado de tarea
+- `DELETE /api/tasks/:id` - Eliminar tarea
 
-## Azure DevOps Deployment
+## Despliegue en Azure App Services
 
-This project includes an `azure-pipelines.yml` file for automated deployment to Azure.
+### Configuración Automática con Azure DevOps
 
-### Setup Steps:
+El proyecto incluye un archivo `azure-pipelines.yml` configurado para:
+1. Construcción automática del código
+2. Pruebas (cuando estén disponibles)
+3. Publicación de artefactos
+4. Despliegue automático a Azure App Services
 
-1. **Create Azure Resources**:
-   - Two Azure App Services (one for API, one for Web)
-   - Configure connection strings in App Service settings
+### Pasos de Configuración:
 
-2. **Configure Pipeline Variables**:
-   - `AzureSubscription`: Your Azure service connection
-   - `ApiAppName`: Name of the API App Service
-   - `WebAppName`: Name of the Web App Service
+1. **Crear Azure App Service**:
+   - Crea un Azure App Service con runtime Node.js 18 LTS
+   - El archivo `web.config` está incluido para configuración de IIS
 
-3. **Update Configuration**:
-   - Update `appsettings.json` in Web project with production API URL
-   - Update JWT settings for production use
+2. **Configurar Variables de Pipeline en Azure DevOps**:
+   - `AzureSubscription`: Tu conexión de servicio de Azure
+   - `AppName`: Nombre del App Service
 
-4. **Create Pipeline**:
-   - In Azure DevOps, create a new pipeline
-   - Select the repository and use the existing `azure-pipelines.yml`
+3. **Configurar Variables de Entorno en Azure**:
+   - En Azure Portal, ve a tu App Service
+   - Settings > Configuration > Application settings
+   - Agrega:
+     - `JWT_SECRET`: Una clave secreta fuerte
+     - `NODE_ENV`: `production`
+     - `DATABASE_PATH`: `/home/data/database.sqlite` (para persistencia)
 
-## Configuration
+4. **Crear Pipeline**:
+   - En Azure DevOps, crea un nuevo pipeline
+   - Selecciona el repositorio y usa el `azure-pipelines.yml` existente
 
-### API (appsettings.json)
+### Base de Datos en Azure
 
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=tiktask.db"
-  },
-  "Jwt": {
-    "Key": "your-secret-key-here",
-    "Issuer": "TikTask2.0",
-    "Audience": "TikTask2.0Users"
-  }
-}
-```
+SQLite funciona en Azure App Services. Para persistencia de datos:
+- Usa `/home/data/` como ruta de base de datos
+- Este directorio persiste entre reinicios
+- Configurado en `DATABASE_PATH=/home/data/database.sqlite`
 
-### Web (appsettings.json)
+## Desarrollo
 
-```json
-{
-  "ApiUrl": "https://localhost:7001"
-}
-```
+### Ejecutar en Modo Desarrollo
 
-## Security Notes
-
-⚠️ **Important for Production**:
-- Change the JWT secret key to a strong, randomly generated value
-- Use HTTPS in production
-- Store connection strings and secrets in Azure Key Vault or environment variables
-- Enable CORS only for specific origins, not all origins
-- Consider adding rate limiting for API endpoints
-
-## Development
-
-### Building the Solution
+Para desarrollo con auto-reload, instala nodemon:
 
 ```bash
-dotnet build
+npm install -g nodemon
+npm run dev
 ```
 
-### Running Tests
+### Estructura de la Base de Datos
 
-```bash
-dotnet test
-```
+#### Tabla Users
+- `id`: INTEGER PRIMARY KEY
+- `username`: TEXT UNIQUE
+- `email`: TEXT UNIQUE
+- `password`: TEXT (hash BCrypt)
+- `role`: TEXT ('user' o 'admin')
+- `created_at`: DATETIME
 
-## Contributing
+#### Tabla Tasks
+- `id`: INTEGER PRIMARY KEY
+- `title`: TEXT
+- `description`: TEXT
+- `due_date`: DATE
+- `completed`: BOOLEAN
+- `user_id`: INTEGER (FK a Users)
+- `created_at`: DATETIME
+- `updated_at`: DATETIME
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+## Seguridad
 
-## License
+✅ Contraseñas hasheadas con BCrypt
+✅ Autenticación JWT con expiración
+✅ Autorización basada en roles
+✅ Validación de datos en backend
+✅ Protección contra acceso no autorizado
+✅ Helmet para headers de seguridad HTTP
+✅ Rate limiting en endpoints de API
+✅ CORS configurado
 
-This project is licensed under the MIT License.
+**Notas Importantes para Producción**:
+- Cambia la clave secreta JWT a un valor fuerte y aleatorio
+- Usa HTTPS en producción
+- Almacena secretos en Azure Key Vault o variables de entorno
+- Considera agregar límites de tasa más estrictos
 
-## Support
+## Solución de Problemas
 
-For issues and questions, please open an issue on GitHub.
+### El servidor no inicia
+- Verifica que el puerto 3000 esté disponible
+- Asegúrate de tener Node.js 18+ instalado
+- Ejecuta `npm install` para instalar dependencias
+
+### Error de base de datos
+- Elimina el archivo `database.sqlite` y reinicia el servidor
+- Verifica permisos de escritura en la carpeta
+- En Azure, asegúrate de usar `/home/data/` para la ruta de BD
+
+### La aplicación no carga en el navegador
+- Verifica que el servidor esté ejecutándose
+- Comprueba la consola del navegador para errores
+- Asegúrate de que el puerto coincida en tu configuración
+
+## Soporte
+
+Para reportar problemas o solicitar nuevas características:
+- Abre un issue en: https://github.com/baujuncos/TP5_IS3/issues
+
+## Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT.
+
+## Autor
+
+Desarrollado como parte del TP5 de Ingeniería de Software 3.
+

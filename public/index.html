@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTask - Gestión de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <div class="container">
+            <div class="auth-card">
+                <h1>🎯 TikTask</h1>
+                <h2>Iniciar Sesión</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Usuario</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div id="loginError" class="error"></div>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+                <p class="text-center">
+                    ¿No tienes cuenta? <a href="#" id="showRegister">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="page hidden">
+        <div class="container">
+            <div class="auth-card">
+                <h1>🎯 TikTask</h1>
+                <h2>Registro</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Usuario</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Contraseña</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <div id="registerError" class="error"></div>
+                    <button type="submit" class="btn btn-primary">Registrarse</button>
+                </form>
+                <p class="text-center">
+                    ¿Ya tienes cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasks Page -->
+    <div id="tasksPage" class="page hidden">
+        <nav class="navbar">
+            <div class="container">
+                <h1>🎯 TikTask</h1>
+                <div class="nav-right">
+                    <span id="userInfo"></span>
+                    <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="tasks-header">
+                <h2 id="tasksTitle">Mis Tareas</h2>
+                <div>
+                    <button id="toggleViewBtn" class="btn btn-secondary hidden">Ver Todas las Tareas</button>
+                    <button id="addTaskBtn" class="btn btn-primary">+ Nueva Tarea</button>
+                </div>
+            </div>
+
+            <div id="tasksList" class="tasks-list">
+                <p class="text-center">Cargando tareas...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Task Modal -->
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle">Nueva Tarea</h3>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Título</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Descripción</label>
+                    <textarea id="taskDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="taskDueDate">Fecha de Vencimiento</label>
+                    <input type="date" id="taskDueDate">
+                </div>
+                <div id="taskError" class="error"></div>
+                <div class="modal-actions">
+                    <button type="button" id="cancelTaskBtn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

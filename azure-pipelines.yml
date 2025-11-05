@@ -1,4 +1,4 @@
-# Azure DevOps Pipeline for TikTask2.0
+# Azure DevOps Pipeline for TikTask - Node.js
 
 trigger:
   - main
@@ -8,59 +8,37 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  buildConfiguration: 'Release'
-  dotnetVersion: '9.0.x'
+  nodeVersion: '18.x'
 
 stages:
   - stage: Build
     displayName: 'Build Stage'
     jobs:
       - job: BuildJob
-        displayName: 'Build TikTask2.0'
+        displayName: 'Build TikTask'
         steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET $(dotnetVersion)'
+          - task: NodeTool@0
+            displayName: 'Use Node $(nodeVersion)'
             inputs:
-              version: '$(dotnetVersion)'
-              includePreviewVersions: false
+              versionSpec: '$(nodeVersion)'
 
-          - task: DotNetCoreCLI@2
-            displayName: 'Restore NuGet Packages'
-            inputs:
-              command: 'restore'
-              projects: '**/*.csproj'
+          - script: |
+              npm install
+            displayName: 'Install Dependencies'
 
-          - task: DotNetCoreCLI@2
-            displayName: 'Build API Project'
-            inputs:
-              command: 'build'
-              projects: 'src/TikTask2.0.API/TikTask2.0.API.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-restore'
+          - script: |
+              npm test
+            displayName: 'Run Tests'
+            continueOnError: true
 
-          - task: DotNetCoreCLI@2
-            displayName: 'Build Web Project'
+          - task: ArchiveFiles@2
+            displayName: 'Archive Files'
             inputs:
-              command: 'build'
-              projects: 'src/TikTask2.0.Web/TikTask2.0.Web.csproj'
-              arguments: '--configuration $(buildConfiguration) --no-restore'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Publish API'
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: 'src/TikTask2.0.API/TikTask2.0.API.csproj'
-              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api'
-              zipAfterPublish: true
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Publish Web'
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: 'src/TikTask2.0.Web/TikTask2.0.Web.csproj'
-              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/web'
-              zipAfterPublish: true
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Artifacts'
@@ -90,19 +68,12 @@ stages:
                     downloadPath: '$(System.ArtifactsDirectory)'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy API to Azure App Service'
+                  displayName: 'Deploy to Azure App Service'
                   inputs:
                     azureSubscription: '$(AzureSubscription)'
-                    appType: 'webApp'
-                    appName: '$(ApiAppName)'
-                    package: '$(System.ArtifactsDirectory)/drop/api/*.zip'
-                    deploymentMethod: 'auto'
+                    appType: 'webAppLinux'
+                    appName: '$(AppName)'
+                    package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
+                    runtimeStack: 'NODE|18-lts'
+                    startUpCommand: 'npm start'
 
-                - task: AzureWebApp@1
-                  displayName: 'Deploy Web to Azure App Service'
-                  inputs:
-                    azureSubscription: '$(AzureSubscription)'
-                    appType: 'webApp'
-                    appName: '$(WebAppName)'
-                    package: '$(System.ArtifactsDirectory)/drop/web/*.zip'
-                    deploymentMethod: 'auto'
