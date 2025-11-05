@@ -46,12 +46,26 @@ app.get(/^(?!\/api).*$/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Initialize database and start server
+
+
+
 async function startServer() {
   try {
+    // ✅ Crear carpeta para DB si es necesario
+    if (process.env.DATABASE_PATH) {
+      const fs = require('fs');
+      const dbDir = path.dirname(process.env.DATABASE_PATH);
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+        console.log(`📁 Created DB directory at: ${dbDir}`);
+      } else {
+        console.log(`📁 DB directory exists: ${dbDir}`);
+      }
+    }
+
     await initDb();
     await seedAdmin();
-    
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📱 Open http://localhost:${PORT} in your browser`);

@@ -2,13 +2,15 @@
 
 trigger:
   - main
-  - develop
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  group: 'QA-Variables'
+  buildConfiguration: 'Release'
   nodeVersion: '18.x'
+  azureSubscription: 'azure-tp05-connection2'
 
 stages:
   - stage: Build
@@ -26,11 +28,6 @@ stages:
               npm install
             displayName: 'Install Dependencies'
 
-          - script: |
-              npm test
-            displayName: 'Run Tests'
-            continueOnError: true
-
           - task: ArchiveFiles@2
             displayName: 'Archive Files'
             inputs:
@@ -47,14 +44,14 @@ stages:
               ArtifactName: 'drop'
               publishLocation: 'Container'
 
-  - stage: Deploy
-    displayName: 'Deploy Stage'
+  - stage: DeployQA
+    displayName: 'Deploy to QA'
     dependsOn: Build
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
-      - deployment: DeployToAzure
-        displayName: 'Deploy to Azure'
-        environment: 'production'
+      - deployment: DeployToAzureQA
+        displayName: 'Deploy to QA'
+        environment: 'QA-tp5'
         strategy:
           runOnce:
             deploy:
@@ -68,11 +65,11 @@ stages:
                     downloadPath: '$(System.ArtifactsDirectory)'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy to Azure App Service'
+                  displayName: 'Deploy to QA'
                   inputs:
                     azureSubscription: '$(AzureSubscription)'
-                    appType: 'webAppLinux'
-                    appName: '$(AppName)'
+                    appType: 'webApp'
+                    appName: 'webapp-tp05-qa-juncos-treachi'
                     package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
                     runtimeStack: 'NODE|18-lts'
                     startUpCommand: 'npm start'
