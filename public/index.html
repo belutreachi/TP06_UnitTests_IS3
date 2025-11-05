@@ -82,6 +82,64 @@
                 </div>
             </div>
 
+            <section id="statsSection" class="stats-panel">
+                <div class="stats-header">
+                    <h3>Estadísticas</h3>
+                    <p id="statsSubtitle" class="stats-subtitle">Resumen de tus tareas</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Completadas</span>
+                        <span id="statsCompleted" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Pendientes</span>
+                        <span id="statsPending" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Total</span>
+                        <span id="statsTotal" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-header">
+                        <span>Progreso</span>
+                        <span id="statsProgressText">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="statsProgressBar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <h3 class="filters-title">Búsqueda por filtros</h3>
+            <form id="filtersForm" class="filters">
+                <div class="form-group">
+                    <label for="filterStatus">Estado</label>
+                    <select id="filterStatus">
+                        <option value="all">Todas</option>
+                        <option value="no_hecha">Pendientes</option>
+                        <option value="hecha">Completadas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterStartDate">Desde</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+                <div class="form-group">
+                    <label for="filterEndDate">Hasta</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+                <div class="form-group">
+                    <label for="filterSearch">Buscar</label>
+                    <input type="text" id="filterSearch" placeholder="Título o descripción">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-secondary">Aplicar</button>
+                    <button type="button" id="clearFiltersBtn" class="btn btn-light">Limpiar</button>
+                </div>
+            </form>
+
             <div id="tasksList" class="tasks-list">
                 <p class="text-center">Cargando tareas...</p>
             </div>

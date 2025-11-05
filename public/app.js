@@ -6,6 +6,8 @@ let currentUser = null;
 let currentToken = null;
 let isViewingAllTasks = false;
 let editingTaskId = null;
+let currentFilters = { status: 'all', startDate: '', endDate: '', search: '' };
+let currentTasks = [];
 
 // DOM Elements
 const loginPage = document.getElementById('loginPage');
@@ -19,6 +21,19 @@ const tasksList = document.getElementById('tasksList');
 const userInfo = document.getElementById('userInfo');
 const toggleViewBtn = document.getElementById('toggleViewBtn');
 const tasksTitle = document.getElementById('tasksTitle');
+const filtersForm = document.getElementById('filtersForm');
+const filterStatus = document.getElementById('filterStatus');
+const filterStartDate = document.getElementById('filterStartDate');
+const filterEndDate = document.getElementById('filterEndDate');
+const filterSearch = document.getElementById('filterSearch');
+const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+const statsSection = document.getElementById('statsSection');
+const statsSubtitle = document.getElementById('statsSubtitle');
+const statsCompletedValue = document.getElementById('statsCompleted');
+const statsPendingValue = document.getElementById('statsPending');
+const statsTotalValue = document.getElementById('statsTotal');
+const statsProgressText = document.getElementById('statsProgressText');
+const statsProgressBar = document.getElementById('statsProgressBar');
 
 // Check if user is logged in
 window.addEventListener('DOMContentLoaded', () => {
@@ -60,7 +75,13 @@ function showTasksPage() {
     } else {
         toggleViewBtn.classList.add('hidden');
     }
-    
+
+    if (filtersForm) {
+        filtersForm.reset();
+        syncFiltersFromForm();
+    }
+
+    updateStatsSubtitle();
     loadTasks();
 }
 
@@ -148,15 +169,24 @@ document.getElementById('showLogin').addEventListener('click', (e) => {
 // Load tasks
 async function loadTasks() {
     const endpoint = isViewingAllTasks ? '/tasks/all' : '/tasks';
-    
+
+    if (tasksList) {
+        tasksList.innerHTML = '<p class="text-center">Cargando tareas...</p>';
+    }
+
+    const params = buildFiltersQueryParams();
+    const queryString = params.toString();
+    const url = `${API_URL}${endpoint}${queryString ? `?${queryString}` : ''}`;
+
     try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${currentToken}` }
         });
-        
+
         if (response.ok) {
             const tasks = await response.json();
             displayTasks(tasks);
+            loadStats();
         } else if (response.status === 401) {
             // Token expired
             logout();
@@ -168,22 +198,135 @@ async function loadTasks() {
     }
 }
 
+function buildFiltersQueryParams() {
+    const params = new URLSearchParams();
+
+    if (currentFilters.status && currentFilters.status !== 'all') {
+        params.set('status', currentFilters.status);
+    }
+
+    if (currentFilters.startDate) {
+        params.set('startDate', currentFilters.startDate);
+    }
+
+    if (currentFilters.endDate) {
+        params.set('endDate', currentFilters.endDate);
+    }
+
+    if (currentFilters.search) {
+        params.set('search', currentFilters.search);
+    }
+
+    return params;
+}
+
+async function loadStats() {
+    if (!statsSection || !currentToken) {
+        return;
+    }
+
+    setStatsLoading();
+
+    const params = buildFiltersQueryParams();
+    if (isViewingAllTasks && currentUser?.role === 'admin') {
+        params.set('view', 'all');
+    }
+
+    const queryString = params.toString();
+    const url = `${API_URL}/tasks/stats${queryString ? `?${queryString}` : ''}`;
+
+    try {
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+
+        if (response.ok) {
+            const stats = await response.json();
+            updateStatsValues(stats);
+        } else if (response.status === 401) {
+            logout();
+        } else {
+            setStatsError();
+        }
+    } catch (error) {
+        setStatsError();
+    }
+}
+
+function setStatsLoading() {
+    if (!statsCompletedValue) {
+        return;
+    }
+
+    statsCompletedValue.textContent = '...';
+    statsPendingValue.textContent = '...';
+    statsTotalValue.textContent = '...';
+    statsProgressText.textContent = '...';
+    statsProgressBar.style.width = '0%';
+}
+
+function setStatsError() {
+    if (!statsCompletedValue) {
+        return;
+    }
+
+    statsCompletedValue.textContent = '—';
+    statsPendingValue.textContent = '—';
+    statsTotalValue.textContent = '—';
+    statsProgressText.textContent = '—';
+    statsProgressBar.style.width = '0%';
+}
+
+function updateStatsValues(stats = {}) {
+    if (!statsCompletedValue) {
+        return;
+    }
+
+    const completed = Number(stats.completed) || 0;
+    const pending = Number(stats.pending) || 0;
+    const total = Number(stats.total) || 0;
+    const progress = Number(stats.progress) || 0;
+
+    statsCompletedValue.textContent = completed;
+    statsPendingValue.textContent = pending;
+    statsTotalValue.textContent = total;
+    statsProgressText.textContent = `${progress}%`;
+    statsProgressBar.style.width = `${progress}%`;
+}
+
+function updateStatsSubtitle() {
+    if (!statsSubtitle) {
+        return;
+    }
+
+    const viewingAll = isViewingAllTasks && currentUser?.role === 'admin';
+    statsSubtitle.textContent = viewingAll ? 'Resumen de todas las tareas' : 'Resumen de tus tareas';
+}
+
 // Display tasks
 function displayTasks(tasks) {
-    if (tasks.length === 0) {
+    currentTasks = Array.isArray(tasks) ? tasks : [];
+
+    if (currentTasks.length === 0) {
+        const hasActiveFilters = currentFilters.status !== 'all' || currentFilters.startDate || currentFilters.endDate || currentFilters.search;
+        const title = hasActiveFilters ? 'Sin resultados' : 'No hay tareas';
+        const description = hasActiveFilters
+            ? 'Ajusta los filtros o prueba con otra búsqueda'
+            : 'Crea tu primera tarea para comenzar';
+
         tasksList.innerHTML = `
             <div class="empty-state">
-                <h3>📝 No hay tareas</h3>
-                <p>Crea tu primera tarea para comenzar</p>
+                <h3>📝 ${title}</h3>
+                <p>${description}</p>
             </div>
         `;
         return;
     }
-    
-    tasksList.innerHTML = tasks.map(task => {
+
+    tasksList.innerHTML = currentTasks.map(task => {
         const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('es-ES') : 'Sin fecha';
         const isOwnTask = task.user_id === currentUser.id;
-        
+
         return `
             <div class="task-card ${task.completed ? 'completed' : ''}">
                 <div class="task-header">
@@ -209,11 +352,28 @@ function displayTasks(tasks) {
     }).join('');
 }
 
+if (filtersForm) {
+    filtersForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        syncFiltersFromForm();
+        loadTasks();
+    });
+}
+
+if (clearFiltersBtn && filtersForm) {
+    clearFiltersBtn.addEventListener('click', () => {
+        filtersForm.reset();
+        syncFiltersFromForm();
+        loadTasks();
+    });
+}
+
 // Toggle view (admin only)
 toggleViewBtn.addEventListener('click', () => {
     isViewingAllTasks = !isViewingAllTasks;
     toggleViewBtn.textContent = isViewingAllTasks ? 'Ver Mis Tareas' : 'Ver Todas las Tareas';
     tasksTitle.textContent = isViewingAllTasks ? 'Todas las Tareas' : 'Mis Tareas';
+    updateStatsSubtitle();
     loadTasks();
 });
 
@@ -268,28 +428,20 @@ taskForm.addEventListener('submit', async (e) => {
 });
 
 // Edit task
-async function editTask(id) {
-    try {
-        const response = await fetch(`${API_URL}/tasks`, {
-            headers: { 'Authorization': `Bearer ${currentToken}` }
-        });
-        
-        if (response.ok) {
-            const tasks = await response.json();
-            const task = tasks.find(t => t.id === id);
-            
-            if (task) {
-                editingTaskId = id;
-                document.getElementById('modalTitle').textContent = 'Editar Tarea';
-                document.getElementById('taskTitle').value = task.title;
-                document.getElementById('taskDescription').value = task.description || '';
-                document.getElementById('taskDueDate').value = task.due_date || '';
-                taskModal.classList.remove('hidden');
-            }
-        }
-    } catch (error) {
-        alert('Error al cargar la tarea');
+function editTask(id) {
+    const task = currentTasks.find(t => t.id === id);
+
+    if (!task) {
+        alert('No se encontró la tarea seleccionada');
+        return;
     }
+
+    editingTaskId = id;
+    document.getElementById('modalTitle').textContent = 'Editar Tarea';
+    document.getElementById('taskTitle').value = task.title;
+    document.getElementById('taskDescription').value = task.description || '';
+    document.getElementById('taskDueDate').value = task.due_date || '';
+    taskModal.classList.remove('hidden');
 }
 
 // Toggle complete
@@ -329,6 +481,19 @@ async function deleteTask(id) {
 }
 
 // Helper functions
+function syncFiltersFromForm() {
+    if (!filtersForm) {
+        return;
+    }
+
+    currentFilters = {
+        status: filterStatus.value,
+        startDate: filterStartDate.value,
+        endDate: filterEndDate.value,
+        search: filterSearch.value.trim()
+    };
+}
+
 function showError(element, message) {
     element.textContent = message;
     element.classList.add('show');

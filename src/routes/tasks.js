@@ -4,13 +4,42 @@ const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
+const parseFilters = (query) => {
+  const filters = {};
+
+  if (query.status) {
+    const status = String(query.status).toLowerCase();
+    if (status === 'hecha' || status === 'no_hecha') {
+      filters.status = status;
+    }
+  }
+
+  if (query.startDate) {
+    filters.startDate = String(query.startDate);
+  }
+
+  if (query.endDate) {
+    filters.endDate = String(query.endDate);
+  }
+
+  if (query.search) {
+    const trimmed = String(query.search).trim();
+    if (trimmed) {
+      filters.search = trimmed;
+    }
+  }
+
+  return filters;
+};
+
 // All routes require authentication
 router.use(authMiddleware);
 
 // Get user's tasks
 router.get('/', async (req, res) => {
   try {
-    const tasks = await Task.findByUserId(req.user.id);
+    const filters = parseFilters(req.query);
+    const tasks = await Task.findByUserId(req.user.id, filters);
     res.json(tasks);
   } catch (error) {
     console.error('Get tasks error:', error);
@@ -21,11 +50,29 @@ router.get('/', async (req, res) => {
 // Get all tasks (admin only)
 router.get('/all', adminMiddleware, async (req, res) => {
   try {
-    const tasks = await Task.findAll();
+    const filters = parseFilters(req.query);
+    const tasks = await Task.findAll(filters);
     res.json(tasks);
   } catch (error) {
     console.error('Get all tasks error:', error);
     res.status(500).json({ message: 'Error fetching all tasks' });
+  }
+});
+
+// Get task stats
+router.get('/stats', async (req, res) => {
+  try {
+    const filters = parseFilters(req.query);
+    const view = String(req.query.view || '').toLowerCase();
+
+    const stats = req.user.role === 'admin' && view === 'all'
+      ? await Task.getStatsForAll(filters)
+      : await Task.getStatsByUserId(req.user.id, filters);
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Get stats error:', error);
+    res.status(500).json({ message: 'Error fetching task stats' });
   }
 });
 
