@@ -263,6 +263,38 @@ body {
     gap: 20px;
 }
 
+.admin-users-modal .admin-panel-subtitle {
+    margin: 0 0 15px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #343a40;
+}
+
+.admin-users-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
 .admin-panel-header {
     display: flex;
     align-items: center;
@@ -632,6 +664,13 @@ body {
     max-width: 500px;
     width: 90%;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+#adminUsersModal .modal-content {
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-content h3 {

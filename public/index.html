@@ -68,6 +68,7 @@
                 <h1>🎯 TikTask</h1>
                 <div class="nav-right">
                     <span id="userInfo"></span>
+                    <button id="manageUsersBtn" class="btn btn-secondary hidden" type="button">Gestión de usuarios</button>
                     <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
                 </div>
             </div>
@@ -109,19 +110,6 @@
                     <div class="progress-bar">
                         <div id="statsProgressBar" class="progress-fill" style="width: 0%"></div>
                     </div>
-                </div>
-            </section>
-
-            <section id="adminUsersSection" class="admin-panel hidden">
-                <div class="admin-panel-header">
-                    <div>
-                        <h3>Gestión de usuarios</h3>
-                        <p class="admin-panel-subtitle">Administra las cuentas registradas en la plataforma</p>
-                    </div>
-                    <button id="refreshUsersBtn" class="btn btn-light" type="button">Actualizar</button>
-                </div>
-                <div id="adminUsersList" class="admin-users-list">
-                    <p class="text-center">Cargando usuarios...</p>
                 </div>
             </section>
 
@@ -187,6 +175,23 @@
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin User Management Modal -->
+    <div id="adminUsersModal" class="modal hidden">
+        <div class="modal-content admin-users-modal">
+            <div class="modal-header">
+                <h3>Gestión de usuarios</h3>
+                <button id="closeUsersModal" class="modal-close" type="button" aria-label="Cerrar">&times;</button>
+            </div>
+            <p class="admin-panel-subtitle">Administra las cuentas registradas en la plataforma</p>
+            <div class="admin-users-toolbar">
+                <button id="refreshUsersBtn" class="btn btn-light" type="button">Actualizar</button>
+            </div>
+            <div id="adminUsersList" class="admin-users-list">
+                <p class="text-center">Cargando usuarios...</p>
+            </div>
         </div>
     </div>
 

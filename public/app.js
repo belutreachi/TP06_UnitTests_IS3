@@ -37,9 +37,11 @@ const statsTotalValue = document.getElementById('statsTotal');
 const statsProgressText = document.getElementById('statsProgressText');
 const statsProgressBar = document.getElementById('statsProgressBar');
 const taskAttachmentsInput = document.getElementById('taskAttachments');
-const adminUsersSection = document.getElementById('adminUsersSection');
+const manageUsersBtn = document.getElementById('manageUsersBtn');
+const adminUsersModal = document.getElementById('adminUsersModal');
 const adminUsersList = document.getElementById('adminUsersList');
 const refreshUsersBtn = document.getElementById('refreshUsersBtn');
+const closeUsersModalBtn = document.getElementById('closeUsersModal');
 const userModal = document.getElementById('userModal');
 const userForm = document.getElementById('userForm');
 const userModalTitle = document.getElementById('userModalTitle');
@@ -90,10 +92,6 @@ function showTasksPage() {
 
     updateStatsSubtitle();
     loadTasks();
-
-    if (currentUser?.role === 'admin') {
-        loadUsers();
-    }
 }
 
 // Login
@@ -412,9 +410,29 @@ if (clearFiltersBtn && filtersForm) {
     });
 }
 
+if (manageUsersBtn) {
+    manageUsersBtn.addEventListener('click', () => {
+        openAdminUsersModal();
+    });
+}
+
 if (refreshUsersBtn) {
     refreshUsersBtn.addEventListener('click', () => {
         loadUsers();
+    });
+}
+
+if (closeUsersModalBtn) {
+    closeUsersModalBtn.addEventListener('click', () => {
+        closeAdminUsersModal();
+    });
+}
+
+if (adminUsersModal) {
+    adminUsersModal.addEventListener('click', (event) => {
+        if (event.target === adminUsersModal) {
+            closeAdminUsersModal();
+        }
     });
 }
 
@@ -711,6 +729,23 @@ function displayUsers(users) {
     }).join('');
 }
 
+function openAdminUsersModal() {
+    if (!adminUsersModal || currentUser?.role !== 'admin') {
+        return;
+    }
+
+    adminUsersModal.classList.remove('hidden');
+    loadUsers();
+}
+
+function closeAdminUsersModal() {
+    if (!adminUsersModal) {
+        return;
+    }
+
+    adminUsersModal.classList.add('hidden');
+}
+
 function openUserModal(userId) {
     const numericId = Number(userId);
     const user = currentUsers.find((item) => item.id === numericId);
@@ -784,18 +819,20 @@ function updateUserHeader() {
     const isAdmin = currentUser.role === 'admin';
 
     if (isAdmin) {
-        toggleViewBtn.classList.remove('hidden');
-        if (adminUsersSection) {
-            adminUsersSection.classList.remove('hidden');
+        if (toggleViewBtn) {
+            toggleViewBtn.classList.remove('hidden');
+        }
+        if (manageUsersBtn) {
+            manageUsersBtn.classList.remove('hidden');
         }
     } else {
-        toggleViewBtn.classList.add('hidden');
-        if (adminUsersSection) {
-            adminUsersSection.classList.add('hidden');
+        if (toggleViewBtn) {
+            toggleViewBtn.classList.add('hidden');
         }
-        if (adminUsersList) {
-            adminUsersList.innerHTML = '<p class="text-center">Funcionalidad disponible solo para administradores.</p>';
+        if (manageUsersBtn) {
+            manageUsersBtn.classList.add('hidden');
         }
+        closeAdminUsersModal();
         if (isViewingAllTasks) {
             isViewingAllTasks = false;
         }
@@ -861,5 +898,6 @@ function logout() {
     currentUser = null;
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    closeAdminUsersModal();
     showLoginPage();
 }
