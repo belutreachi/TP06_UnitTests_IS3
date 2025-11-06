@@ -78,6 +78,12 @@ body {
     border-color: #667eea;
 }
 
+.form-helper {
+    margin-top: 6px;
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
 .btn {
     padding: 12px 24px;
     border: none;
@@ -410,6 +416,76 @@ body {
 .task-description {
     color: #555;
     margin-bottom: 15px;
+}
+
+.task-attachments {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+.task-card.completed .task-attachments {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.task-attachments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.attachments-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.attachments-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.95em;
+}
+
+.attachments-list a {
+    color: #4c6ef5;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.attachments-list a:hover {
+    text-decoration: underline;
+}
+
+.attachment-size {
+    color: #868e96;
+    font-size: 0.85em;
+}
+
+.attachment-remove {
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.attachment-remove:hover {
+    background: rgba(220, 53, 69, 0.12);
 }
 
 .task-actions {

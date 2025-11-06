@@ -153,15 +153,20 @@
             <form id="taskForm">
                 <div class="form-group">
                     <label for="taskTitle">Título</label>
-                    <input type="text" id="taskTitle" required>
+                    <input type="text" id="taskTitle" name="title" required>
                 </div>
                 <div class="form-group">
                     <label for="taskDescription">Descripción</label>
-                    <textarea id="taskDescription" rows="3"></textarea>
+                    <textarea id="taskDescription" name="description" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="taskDueDate">Fecha de Vencimiento</label>
-                    <input type="date" id="taskDueDate">
+                    <input type="date" id="taskDueDate" name="due_date">
+                </div>
+                <div class="form-group">
+                    <label for="taskAttachments">Archivos adjuntos</label>
+                    <input type="file" id="taskAttachments" name="attachments" multiple>
+                    <p class="form-helper">Puedes seleccionar varios archivos (máx. 10 MB por archivo)</p>
                 </div>
                 <div id="taskError" class="error"></div>
                 <div class="modal-actions">

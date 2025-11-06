@@ -1,8 +1,36 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const Task = require('../models/Task');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
+
+const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const random = Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${timestamp}-${random}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB
+    files: 10
+  }
+});
 
 const parseFilters = (query) => {
   const filters = {};
@@ -77,7 +105,7 @@ router.get('/stats', async (req, res) => {
 });
 
 // Create task
-router.post('/', async (req, res) => {
+router.post('/', upload.array('attachments', 10), async (req, res) => {
   try {
     const { title, description, due_date } = req.body;
 
@@ -85,8 +113,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Title is required' });
     }
 
+    const files = req.files || [];
     const task = await Task.create(title, description, due_date, req.user.id);
-    res.status(201).json(task);
+
+    if (files.length > 0) {
+      await Task.addAttachments(task.id, files);
+    }
+
+    const createdTask = await Task.findById(task.id);
+    res.status(201).json(createdTask);
   } catch (error) {
     console.error('Create task error:', error);
     res.status(500).json({ message: 'Error creating task' });
@@ -94,22 +129,28 @@ router.post('/', async (req, res) => {
 });
 
 // Update task
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.array('attachments', 10), async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, due_date } = req.body;
 
     // Check if task exists and belongs to user
-    const task = await Task.findById(id);
-    if (!task) {
+    const existingTask = await Task.findById(id);
+    if (!existingTask) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    if (task.user_id !== req.user.id) {
+    if (existingTask.user_id !== req.user.id) {
       return res.status(403).json({ message: 'You can only edit your own tasks' });
     }
 
     await Task.update(id, title, description, due_date);
+
+    const files = req.files || [];
+    if (files.length > 0) {
+      await Task.addAttachments(id, files);
+    }
+
     const updatedTask = await Task.findById(id);
     res.json(updatedTask);
   } catch (error) {
@@ -162,6 +203,36 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Delete task error:', error);
     res.status(500).json({ message: 'Error deleting task' });
+  }
+});
+
+// Delete attachment
+router.delete('/:id/attachments/:attachmentId', async (req, res) => {
+  try {
+    const { id, attachmentId } = req.params;
+
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    if (task.user_id !== req.user.id) {
+      return res.status(403).json({ message: 'You can only edit your own tasks' });
+    }
+
+    const attachment = await Task.findAttachmentById(attachmentId, { publicOnly: false });
+
+    if (!attachment || Number(attachment.task_id) !== Number(id)) {
+      return res.status(404).json({ message: 'Attachment not found' });
+    }
+
+    await Task.deleteAttachment(attachmentId);
+    const attachments = await Task.getAttachments(id);
+
+    res.json({ message: 'Attachment deleted successfully', attachments });
+  } catch (error) {
+    console.error('Delete attachment error:', error);
+    res.status(500).json({ message: 'Error deleting attachment' });
   }
 });
 

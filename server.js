@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 const { initDb } = require('./src/config/database');
 const { seedAdmin } = require('./src/seed');
 const authRoutes = require('./src/routes/auth');
@@ -31,6 +32,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files
 app.use(express.static('public'));
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
 
 // API routes
 app.use('/api/auth', authRoutes);

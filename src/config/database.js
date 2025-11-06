@@ -54,10 +54,32 @@ const initDb = () => {
         if (err) {
           console.error('Error creating tasks table:', err);
           reject(err);
-        } else {
-          console.log('Tasks table ready');
-          resolve();
+          return;
         }
+
+        console.log('Tasks table ready');
+
+        db.run(`
+          CREATE TABLE IF NOT EXISTS task_attachments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id INTEGER NOT NULL,
+            original_name TEXT NOT NULL,
+            file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            mime_type TEXT,
+            size INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+          )
+        `, (attachmentsErr) => {
+          if (attachmentsErr) {
+            console.error('Error creating task_attachments table:', attachmentsErr);
+            reject(attachmentsErr);
+          } else {
+            console.log('Task attachments table ready');
+            resolve();
+          }
+        });
       });
     });
   });
