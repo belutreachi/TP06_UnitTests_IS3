@@ -1,76 +1,72 @@
-# Azure DevOps Pipeline for TikTask - Node.js
+# Azure DevOps Pipeline para TikTask
+# Ejecuta tests automáticamente en cada push/PR
 
 trigger:
   - main
+  - develop
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  group: 'QA-Variables'
-  buildConfiguration: 'Release'
-  nodeVersion: '18.x'
-  azureSubscription: 'azure-tp05-connection2'
+  NODE_VERSION: '18.x'
 
 stages:
-  - stage: Build
-    displayName: 'Build Stage'
+  - stage: Build_and_Test
+    displayName: 'Build and Test'
     jobs:
-      - job: BuildJob
-        displayName: 'Build TikTask'
+      - job: RunTests
+        displayName: 'Run Unit and Integration Tests'
         steps:
+          # 1. Checkout del código
+          - checkout: self
+            displayName: 'Checkout repository'
+
+          # 2. Configurar Node.js
           - task: NodeTool@0
-            displayName: 'Use Node $(nodeVersion)'
             inputs:
-              versionSpec: '$(nodeVersion)'
+              versionSpec: $(NODE_VERSION)
+            displayName: 'Install Node.js $(NODE_VERSION)'
 
+          # 3. Instalar dependencias
           - script: |
-              npm install
-            displayName: 'Install Dependencies'
+              npm ci
+            displayName: 'npm install'
 
-          - task: ArchiveFiles@2
-            displayName: 'Archive Files'
+          # 4. Ejecutar tests con cobertura
+          - script: |
+              npm run test:ci
+            displayName: 'Run tests with coverage'
+            env:
+              NODE_ENV: test
+
+          # 5. Publicar resultados de tests
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
             inputs:
-              rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-              includeRootFolder: false
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-              replaceExistingArchive: true
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/test-results/junit.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)'
+              mergeTestResults: true
+              failTaskOnFailedTests: true
+              testRunTitle: 'TikTask Tests - $(Build.BuildNumber)'
 
+          # 6. Publicar cobertura de código
+          - task: PublishCodeCoverageResults@2
+            displayName: 'Publish Code Coverage'
+            condition: succeededOrFailed()
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/coverage'
+              failIfCoverageEmpty: false
+
+          # 7. Publicar artefactos (opcional)
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Artifacts'
+            condition: succeeded()
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              PathtoPublish: '$(System.DefaultWorkingDirectory)'
               ArtifactName: 'drop'
               publishLocation: 'Container'
-
-  - stage: DeployQA
-    displayName: 'Deploy to QA'
-    dependsOn: Build
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-    jobs:
-      - deployment: DeployToAzureQA
-        displayName: 'Deploy to QA'
-        environment: 'QA-tp5'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: DownloadBuildArtifacts@1
-                  displayName: 'Download Artifacts'
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'drop'
-                    downloadPath: '$(System.ArtifactsDirectory)'
-
-                - task: AzureWebApp@1
-                  displayName: 'Deploy to QA'
-                  inputs:
-                    azureSubscription: '$(AzureSubscription)'
-                    appType: 'webApp'
-                    appName: 'webapp-tp05-qa-juncos-treachi'
-                    package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
-                    runtimeStack: 'NODE|18-lts'
-                    startUpCommand: 'npm start'
-

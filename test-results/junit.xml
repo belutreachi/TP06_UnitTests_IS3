@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="29" failures="0" errors="0" time="6.102">
+  <testsuite name="tests/integration/tasks.update.int.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:08" time="2.557" tests="4">
+    <testcase classname="Tasks UPDATE (PUT /api/tasks/:id)" name="✅ El propietario puede actualizar su propia task" time="0.266">
+    </testcase>
+    <testcase classname="Tasks UPDATE (PUT /api/tasks/:id)" name="❌ Un usuario NO puede actualizar la task de otro usuario (403)" time="0.387">
+    </testcase>
+    <testcase classname="Tasks UPDATE (PUT /api/tasks/:id)" name="🛂 Un admin SÍ puede actualizar la task de otro usuario" time="0.285">
+    </testcase>
+    <testcase classname="Tasks UPDATE (PUT /api/tasks/:id)" name="🧹 Validación: update con payload inválido devuelve 400" time="0.191">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/tasks.controller.errors.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:11" time="0.756" tests="6">
+    <testcase classname="Tasks controller – manejo de errores" name="PUT /api/tasks/:id responde 500 si update lanza error" time="0.103">
+    </testcase>
+    <testcase classname="Tasks controller – manejo de errores" name="POST /api/tasks devuelve 400 si falta title" time="0.092">
+    </testcase>
+    <testcase classname="Tasks controller – manejo de errores" name="PUT /api/tasks/:id devuelve 404 si no existe" time="0.091">
+    </testcase>
+    <testcase classname="Tasks controller – manejo de errores" name="GET /api/tasks sin token → 401" time="0.003">
+    </testcase>
+    <testcase classname="Tasks controller – manejo de errores" name="GET /api/tasks/:id con id inválido devuelve 400/404" time="0.094">
+    </testcase>
+    <testcase classname="Tasks controller – manejo de errores" name="PUT /api/tasks/:id sin token devuelve 401" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/frontend/app.tasks.edge.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:12" time="0.628" tests="3">
+    <testcase classname="Tasks – casos edge" name="si /api/tasks devuelve arreglo vacío, se muestra estado &quot;sin tareas&quot;" time="0.298">
+    </testcase>
+    <testcase classname="Tasks – casos edge" name="renderiza una lista grande sin romper (100 ítems)" time="0.105">
+    </testcase>
+    <testcase classname="Tasks – casos edge" name="si /api/tasks devuelve 500, muestra estado de error y no rompe" time="0.072">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/integration/tasks.controller.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:13" time="0.443" tests="5">
+    <testcase classname="Tasks Controller CRUD (Integration, AAA)" name="CREATE task" time="0.008">
+    </testcase>
+    <testcase classname="Tasks Controller CRUD (Integration, AAA)" name="GET all tasks" time="0.005">
+    </testcase>
+    <testcase classname="Tasks Controller CRUD (Integration, AAA)" name="GET task by ID" time="0.008">
+    </testcase>
+    <testcase classname="Tasks Controller CRUD (Integration, AAA)" name="UPDATE task" time="0.014">
+    </testcase>
+    <testcase classname="Tasks Controller CRUD (Integration, AAA)" name="DELETE task" time="0.014">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/frontend/app.login.errors.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:13" time="0.214" tests="3">
+    <testcase classname="Login – manejo de errores" name="si la API devuelve 401, muestra error y permanece en login" time="0.019">
+    </testcase>
+    <testcase classname="Login – manejo de errores" name="no envía si usuario o password están vacíos" time="0.023">
+    </testcase>
+    <testcase classname="Login – manejo de errores" name="si el servidor devuelve 500, muestra mensaje de error y permanece en login" time="0.028">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/frontend/app.render.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:13" time="0.17" tests="2">
+    <testcase classname="UI render básico (index.html)" name="muestra el título TikTask y el form de login" time="0.021">
+    </testcase>
+    <testcase classname="UI render básico (index.html)" name="tiene los elementos clave de la vista de tareas" time="0.014">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/frontend/app.flow.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:14" time="0.156" tests="1">
+    <testcase classname="Flujo simple: login → muestra Tasks" name="al loguear OK, oculta login y muestra tasks" time="0.021">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/admin.middleware.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:14" time="0.145" tests="2">
+    <testcase classname="adminMiddleware" name="pasa si role=admin" time="0.001">
+    </testcase>
+    <testcase classname="adminMiddleware" name="bloquea si no es admin" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/auth.middleware.test.js" errors="0" failures="0" skipped="0" timestamp="2025-11-07T21:55:14" time="0.147" tests="3">
+    <testcase classname="Auth Middleware (AAA)" name="✅ Token válido → next()" time="0.001">
+    </testcase>
+    <testcase classname="Auth Middleware (AAA)" name="❌ Sin token → 401" time="0.001">
+    </testcase>
+    <testcase classname="Auth Middleware (AAA)" name="❌ Token inválido → 401" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

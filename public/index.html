@@ -22,7 +22,7 @@
                         <label for="loginPassword">Contraseña</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <div id="loginError" class="error"></div>
+                    <div id="loginError" class="error hidden" role="alert"></div>
                     <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                 </form>
                 <p class="text-center">
@@ -140,6 +140,9 @@
                     <button type="button" id="clearFiltersBtn" class="btn btn-light">Limpiar</button>
                 </div>
             </form>
+
+            <div id="tasksError" class="error hidden" role="alert"></div>
+            <div id="tasksEmpty" class="empty hidden">No hay tareas para mostrar</div>
 
             <div id="tasksList" class="tasks-list">
                 <p class="text-center">Cargando tareas...</p>
