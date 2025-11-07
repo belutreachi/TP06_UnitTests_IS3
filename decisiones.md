@@ -3,6 +3,18 @@
 Para este TP usaremos una aplicación web full-stack construida con Node.js y Express, usando una base de datos SQLite. 
 La aplicación llamada **TikTask** es un gestor de tareas donde se le permite a los usuarios registrarse, iniciar sesión, crear y gestionar tareas personales, hacer búsquedas filtradas de las mismas y ver estadísticas sobre su avance. El usuario administrador además puede gestionar usuarios y ver las tareas de todos.
 
+## Objetivo del TP
+El objetivo de este trabajo práctico es validar calidad y correcto funcionamiento del proyecto usando Jest, Testing Library, mocks y pipeline CI/CD con reporte automático de pruebas.
+
+## Herramientas utilizadas y por qué
+| Herramienta | Uso | Motivo |
+|------------|-----|--------|
+| Jest | Test runner + assertions | Popular en ecosistema JS, soporte para mocks integrado |
+| Supertest | Tests de API/HTTP | Permite simular peticiones reales al backend |
+| Testing Library + jsdom | Tests de UI | Simula navegador, permite probar interacción de usuario |
+| Jest-JUnit | Reporte XML para CI/CD | Necesario para Azure DevOps y publicación de resultados de test |
+
+# Desarrollo del TP
 ## 1. Verificar el correcto funcionamiento de nuestra App
 Primero debemos corroborar que todas las funcionalidades de la App funcionan correctamente.
 
@@ -528,10 +540,13 @@ git push origin main
 ```
 
 ### 6.5. Configurar en Azure DevOps
-1. Creo un nuevo proyecto llamado *TP5-UnitTests*
+1. Creo un nuevo proyecto llamado *TP5-UnitTests*.
 ![alt text](image-25.png)
-2. Voy a *Pipelines → Create Pipeline → GitHub*
+2. Voy a *Pipelines → Create Pipeline → GitHub*.
 3. Elijo mi repositorio
-4. Corro el pipeline haciendo click en *Run*
+4. Corro el pipeline haciendo click en *Run*.
 ![alt text](image-26.png)
-5. 
+5. Vemos que el pipeline corrió exitosamente completando todos los pasos.
+![alt text](image-27.png)
+6. Se genera el reporte de las pruebas mostrando que todos los tests pasaron. Este reporte se puede visualizar en la pestaña *Tests* del pipeline.
+![alt text](image-28.png)

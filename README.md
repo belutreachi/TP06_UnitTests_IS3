@@ -145,6 +145,32 @@ Abre tu navegador y navega a `http://localhost:3000`
 - `PATCH /api/tasks/:id/complete` - Alternar completado de tarea
 - `DELETE /api/tasks/:id` - Eliminar tarea
 
+## Cómo ejecutar tests localmente
+
+### Prerrequisitos
+- **Node.js** ≥ 18 LTS  
+- **npm** ≥ 9
+- SO probado: macOS / Linux / Windows
+- Variables de entorno:
+  - Crear un archivo **`.env`** (para ejecución normal) y, si se quiere aislar los tests, un **`.env.test`**. 
+  - Valores típicos:
+    ```
+    PORT=3000
+    JWT_SECRET=dev-secret
+    DB_PATH=./database.sqlite
+    ```
+    > En modo test, el runner re-crea las tablas y siembra el usuario admin (`admin / Admin123!`).
+
+### Instalación
+```bash
+npm ci
+```
+
+### Ejecutar todos los tests
+```bash
+npm test
+```
+
 ## Despliegue en Azure App Services
 
 ### Configuración Automática con Azure DevOps
