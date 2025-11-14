@@ -118,6 +118,7 @@ npm test
 Se hicieron tests para servicios, controladores y lógica de negocio usando:
 - **Patrón AAA**: todos los tests siguen Arrange → Act → Assert.
 - **Unit tests**: `auth.middleware.test.js` (autenticación), `admin.middleware.test.js` (autorización por rol).
+- **Unit tests del modelo User**: `user.model.test.js` testea todas las operaciones CRUD (create, findByUsername, findByEmail, findById, findAll, update, deleteById) con validaciones de campos, manejo de roles (user/admin), y casos edge (usuarios inexistentes, campos vacíos, valores inválidos).
 - **Integration tests**: `tasks.controller.test.js` (CRUD completo), `tasks.update.int.test.js` (reglas de negocio: dueño vs otro usuario vs admin, y códigos 200/403/404).
 - **Resultados**: 4/4 suites OK, 14/14 tests OK.
 ![alt text](image-21.png)
